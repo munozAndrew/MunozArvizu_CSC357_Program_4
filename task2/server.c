@@ -38,16 +38,66 @@ void handle_request(int nfd)
       close(nfd);
       return;
    }
+	num = getline(&line, &size, network);
+    if (num <= 0)
+    {
+        free(line);
+        fclose(network);
+        return;
+    }
 
+    char method[5], path[1024], version[10];
+    sscanf(line, "%s %s %s", method, path, version);
+
+    if (strcmp(method, "GET") == 0 || strcmp(method, "HEAD") == 0)
+    {
+        memmove(path, path+1, strlen(path));
+
+        FILE *file = fopen(path, "r");
+        if (file == NULL)
+        {
+            dprintf(nfd, "HTTP 404 Not Found\n");
+        }
+        else
+        {
+            fseek(file, 0, SEEK_END);
+            long length = ftell(file);
+            fseek(file, 0, SEEK_SET);
+
+        
+            dprintf(nfd, "HTTP/1.0 200 OK %ld\n", length);
+            
+            if (strcmp(method, "GET") == 0)
+            {
+                char buffer[1024];
+                size_t bytesRead;
+                while ((bytesRead = fread(buffer, 1, sizeof(buffer), file)) > 0)
+                {
+                    write(nfd, buffer, bytesRead);
+                }
+            }
+
+            fclose(file);
+        }
+    }
+    else
+    {
+        dprintf(nfd, "HTTP 501 Not Implemented\n");
+    }
+/*
    while ((num = getline(&line, &size, network)) >= 0)
    {
 	write(nfd, line, num);
       //printf("%s", line);
    }
-
+*/
    free(line);
    fclose(network);
 }
+
+
+
+
 void run_service(int fd)
 {
    while (1)
