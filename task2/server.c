@@ -34,13 +34,15 @@ void handle_request(int nfd)
 
    if (network == NULL)
    {
-      perror("fdopen");
+      dprintf(nfd, "HTTP/1.0 500 Internal Error\n");
       close(nfd);
       return;
    }
 	num = getline(&line, &size, network);
     if (num <= 0)
     {
+	dprintf(nfd, "HTTP/1.0 400 Bad Request\n");
+
         free(line);
         fclose(network);
         return;
