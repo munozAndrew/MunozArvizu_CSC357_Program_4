@@ -58,7 +58,7 @@ void handle_request(int nfd)
         FILE *file = fopen(path, "r");
         if (file == NULL)
         {
-            dprintf(nfd, "HTTP 404 Not Found\n");
+            dprintf(nfd, "HTTP/1.0 404 Not Found\n");
         }
         else
         {
@@ -84,7 +84,7 @@ void handle_request(int nfd)
     }
     else
     {
-        dprintf(nfd, "HTTP 501 Not Implemented\n");
+        dprintf(nfd, "HTTP/1.0 501 Not Implemented\n");
     }
 /*
    while ((num = getline(&line, &size, network)) >= 0)
