@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#define PORT 3402
+//#define PORT 3402
 
 void handle_request(int nfd)
 {
@@ -44,17 +44,37 @@ void run_service(int fd)
    }
 }
 
-int main(void)
+int main(int argc, char *argv[])
 {
-   int fd = create_service(PORT);
+
+	if (argc != 2) {
+		perror("Include Port\n");
+		exit(1);
+	}
+
+   int port = atoi(argv[1]);
+
+
+   if (port < 1024 || port > 65535) {
+	perror("Port must be between 1024 and 65535\n");
+	exit(1);
+   }
+
+
+
+
+
+
+
+   int fd = create_service(port);
 
    if (fd == -1)
    {
-      perror(0);
+      perror("Error creating service\n");
       exit(1);
    }
 
-   printf("listening on port: %d\n", PORT);
+   printf("listening on port: %d\n", port);
    run_service(fd);
    close(fd);
 
