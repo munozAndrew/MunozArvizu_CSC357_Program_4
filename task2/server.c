@@ -58,7 +58,14 @@ void handle_request(int nfd)
         FILE *file = fopen(path, "r");
         if (file == NULL)
         {
-            dprintf(nfd, "HTTP/1.0 404 Not Found\n");
+            if (errno == EACCES)
+            {
+                dprintf(nfd, "HTTP/1.0 403 Permission Denied\n");
+            }
+            else
+            {
+                dprintf(nfd, "HTTP/1.0 404 Not Found\n");
+            }
         }
         else
         {
